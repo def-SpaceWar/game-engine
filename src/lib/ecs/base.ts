@@ -1,6 +1,6 @@
 export class Entity {
-    public id: number = -1;
     private map = new Map<string, Component>();
+    id: number = -1;
 
     constructor(...components: Component[]) {
         const size = components.length;
@@ -12,24 +12,25 @@ export class Entity {
         c.entity = this;
     }
 
-    remove(c: string) { this.map.delete(c); }
-
-    get<T>(c: string): T | undefined {
-        return this.map.get(c) as T | undefined;
+    remove(c: string) {
+        const comp = this.map.get(c);
+        if (!comp) return;
+        this.map.delete(c);
+        comp.entity = undefined;
     }
 
-    /**
-     * @deprecated It's less performant than `.get("Component")`, only use for
-     * testing.
-     */
-    $get<T>(c: new (...args: any[]) => T): T | undefined {
-        return this.get(c.name);
+    get<T>(c: new (...args: any[]) => T): T | undefined {
+        return this.map.get(c.name) as T | undefined;
+    }
+
+    reset() {
+        for (const [key, _] of this.map.entries()) this.remove(key);
     }
 }
 
 export type Component = {
-    entity: Entity;
-}
+    entity?: Entity;
+};
 
 export class World {
     private entityCount = 0;
@@ -60,10 +61,11 @@ export class World {
         }
     }
 
-    remove(id: number) {
+    destroy(id: number) {
         const target = this.entities[id];
         if (!target) return;
         target.id = -1;
+        target.reset();
         this.entities[id] = undefined;
         this.entityCount--;
     }
@@ -71,13 +73,20 @@ export class World {
     get(id: number) {
         return this.entities[id];
     }
+
+    *iterate(start = 0) {
+        for (let i = start; i < this.maxEntityCount; i++) {
+            const entity = this.entities[i];
+            if (entity) yield entity;
+        }
+    }
 }
 
-/** Stuff like rendering systems. */
 export type Processor = (w: World) => void;
-/** Transformations that modify the world's state. */
 export type System = (w: World) => Command;
+
+export type Scene = [() => World, System[], Processor[]]
 export type Command
     = ["continue"]
     | ["stop"]
-    | ["world", number];
+    | ["scene", number];

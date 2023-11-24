@@ -1,40 +1,43 @@
-import { Processor, System, World } from "./base";
+import { Scene } from "./base";
 
 function setAnimation(f: () => void) {
-    let id = requestAnimationFrame(fPrime);
-    function fPrime() {
+    let id = requestAnimationFrame(fNew);
+    function fNew() {
         f();
-        id = requestAnimationFrame(fPrime);
+        id = requestAnimationFrame(fNew);
     };
     return () => cancelAnimationFrame(id);
 }
 
 export let dt = 0;
-
-export function initEngine(worlds: World[], systems: System[], processors: Processor[], startId = 0) {
-    let currentWorld = worlds[startId],
+export function initProgram(scenes: Scene[], startId = 0) {
+    let world = scenes[startId][0](),
+    	systems = scenes[startId][1],
+    	processors = scenes[startId][2],
         before = performance.now();
 
     const systemSize = systems.length,
         intervalId = setInterval(() => {
             const now = performance.now();
             dt = (now - before) / 1000, before = now;
-            for (let i = 0, result = systems[i](currentWorld); i < systemSize; i++)
+            for (let i = 0, result = systems[i](world); i < systemSize; i++)
                 switch (result[0]) {
                     case "continue":
                         break;
                     case "stop":
-                        alert("Stopped!")
+                        document.title = "Stopped!";
                         stopAll();
                         break;
-                    case "world":
-                        currentWorld = worlds[result[1]];
+                    case "scene":
+                        world = scenes[result[1]][0]();
+                        systems = scenes[result[1]][1];
+                        processors = scenes[result[1]][2];
                         break;
                 }
-        }),
+        }, 2),
         processorSize = processors.length,
         stop = setAnimation(() => {
-            for (let i = 0; i < processorSize; i++) processors[i](currentWorld);
+            for (let i = 0; i < processorSize; i++) processors[i](world);
         });
 
     function stopAll() {
