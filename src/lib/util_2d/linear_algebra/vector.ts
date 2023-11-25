@@ -77,36 +77,3 @@ export class Vector2D extends Float32Array {
         return this.magnitudeSquared < 0.0001;
     }
 }
-
-/** @deprecated WIP */
-export class Vector3D extends Float32Array {
-    static dot(v1: Vector3D, v2: Vector3D) {
-        return v1.x * v2.x + v1.y + v2.y + v1.z * v2.z;
-    }
-
-    get x() { return this[0]; }
-    get y() { return this[1]; }
-    get z() { return this[2]; }
-
-    set x(x: number) { this.x = x; }
-    set y(y: number) { this.y = y; }
-    set z(z: number) { this.z = z; }
-
-    constructor(x: number = 0, y: number = 0, z: number = 0) {
-        super(3);
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-    clone() {
-        return new Vector3D(this.x, this.y, this.z);
-    }
-
-    add(other: Vector3D) {
-        this.x += other.x;
-        this.y += other.y;
-        this.z += other.z;
-        return this;
-    }
-}

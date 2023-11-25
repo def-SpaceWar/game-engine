@@ -19,18 +19,31 @@ export class TreeNode {
  * @description - Enforces the hierarchy specified. It's only your fault if
  * you mess up while using this.
  */
-export const
-    entityTree = (world: World, a: number, ...bs: number[]) => {
-        const entityA = world.get(a),
-            aNode = entityA?.get(TreeNode);
-        if (aNode) aNode.down = aNode.down.concat(bs);
-        else if (entityA) entityA.add(new TreeNode(undefined, bs));
-        else return;
+export const entityTree = (world: World, a: number, ...bs: number[]) => {
+    const entityA = world.get(a),
+        aNode = entityA?.get(TreeNode);
+    if (aNode) aNode.down = aNode.down.concat(bs);
+    else if (entityA) entityA.add(new TreeNode(undefined, bs));
+    else return;
 
-        const size = bs.length;
-        for (let i = 0, b = world.get(bs[i]), bNode = b?.get(TreeNode); i < size; i++)
-            if (bNode) bNode.up = a;
-            else b?.add(new TreeNode(a, []));
-    },
+    const size = bs.length;
+    for (let i = 0; i < size; i++) {
+        const b = world.get(bs[i]),
+            bNode = b?.get(TreeNode);
+        if (bNode) bNode.up = a;
+        else b?.add(new TreeNode(a, []));
+    }
+};
+
+export const
     getParent = (e: Entity) => e.get(TreeNode)?.up,
+    getAllParents = function*(w: World, e: Entity) {
+        let parentId = getParent(e),
+            parent = (parentId === undefined) ? undefined : w.get(parentId);
+        while (parent !== undefined) {
+            yield parent;
+            parentId = getParent(parent);
+            parent = (parentId === undefined) ? undefined : w.get(parentId);
+        }
+    },
     getChildren = (e: Entity) => e.get(TreeNode)?.down;
