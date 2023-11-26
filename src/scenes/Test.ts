@@ -1,13 +1,12 @@
 import { C2DColor } from "../lib/canvas2d/fill";
-import { C2DRender } from "../lib/canvas2d/render";
-import { createC2DRenderProcessor } from "../lib/canvas2d/processor";
+import { C2DRender, createC2DRenderProcessor } from "../lib/canvas2d/render";
 import { Entity, Scene, System, World } from "../lib/ecs/base";
 import { dt } from "../lib/ecs/loop";
-import { entityTree } from "../lib/hierarchy/tree";
+import { enforceHierarchy } from "../lib/hierarchy";
 import { Matrix2D } from "../lib/util_2d/linear_algebra/matrix";
 import { Vector2D } from "../lib/util_2d/linear_algebra/vector";
 import { Transform2D } from "../lib/util_2d/transform";
-import { Input } from "../lib/ecs/input";
+import { isKey } from "../lib/ecs/input";
 
 function testWorld() {
     const world = new World();
@@ -46,7 +45,7 @@ function testWorld() {
 
     world.add(player);
     world.add(gun);
-    entityTree(world, player.id, gun.id);
+    enforceHierarchy(world, player.id, gun.id);
 
     return world;
 }
@@ -54,7 +53,7 @@ function testWorld() {
 const testSystem = (): System => {
     let frame = 0;
     return w => {
-        w.get(0)!.get(Transform2D)!.rotation += Input.key("a") ? 5 * dt : -5 * dt;
+        w.get(0)!.get(Transform2D)!.rotation += dt * (isKey("a") ? 5 : -5);
 
         if (frame % 100 === 0) w.add(
             new Entity(
@@ -68,7 +67,7 @@ const testSystem = (): System => {
                     'ellipse',
                     -100, -75,
                     200, 150,
-                    C2DColor.random()
+                    C2DColor.random(), 0,
                 ])
             )
         );

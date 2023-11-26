@@ -1,4 +1,4 @@
-import { Entity, World } from "../ecs/base";
+import { Entity, World } from "./ecs/base";
 
 export class TreeNode {
     entity?: Entity;
@@ -19,7 +19,7 @@ export class TreeNode {
  * @description - Enforces the hierarchy specified. It's only your fault if
  * you mess up while using this.
  */
-export const entityTree = (world: World, a: number, ...bs: number[]) => {
+export const enforceHierarchy = (world: World, a: number, ...bs: number[]) => {
     const entityA = world.get(a),
         aNode = entityA?.get(TreeNode);
     if (aNode) aNode.down = aNode.down.concat(bs);

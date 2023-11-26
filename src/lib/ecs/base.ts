@@ -12,19 +12,20 @@ export class Entity {
         c.entity = this;
     }
 
-    remove(c: string) {
-        const comp = this.map.get(c);
+    remove(c: new (...args: any[]) => Component) {
+        const name = c.name,
+            comp = this.map.get(name);
         if (!comp) return;
-        this.map.delete(c);
+        this.map.delete(name);
         comp.entity = undefined;
     }
 
-    get<T>(c: new (...args: any[]) => T): T | undefined {
+    get<T extends Component>(c: new (...args: any[]) => T): T | undefined {
         return this.map.get(c.name) as T | undefined;
     }
 
     reset() {
-        for (const [key, _] of this.map.entries()) this.remove(key);
+        for (const [key, _] of this.map.entries()) this.map.delete(key);
     }
 }
 

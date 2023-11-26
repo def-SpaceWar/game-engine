@@ -1,68 +1,66 @@
-export class Input {
-    private static keys: string[] = [];
-    private static _mouseX: number = Infinity;
-    private static _mouseY: number = Infinity;
-    private static _isMouseDown: boolean = false;
+const keys: string[] = [];
+let _mouseX: number = Infinity,
+    _mouseY: number = Infinity,
+    _isMouseDown: boolean = false;
 
-    static startKey() {
-        addEventListener("keydown", this.keydown);
-        addEventListener("keyup", this.keyup);
-    }
+export function listenKeys() {
+    addEventListener("keydown", keydown);
+    addEventListener("keyup", keyup);
+}
 
-    static startMouse() {
-        addEventListener("mousemove", this.mousemove);
-        addEventListener("mousedown", this.mousedown);
-        addEventListener("mouseup", this.mouseup);
-    }
+export function listenMouse() {
+    addEventListener("mousemove", mousemove);
+    addEventListener("mousedown", mousedown);
+    addEventListener("mouseup", mouseup);
+}
 
-    static startAll() {
-        this.startKey();
-        this.startMouse();
-    }
+export function listenAll() {
+    listenKeys();
+    listenMouse();
+}
 
-    static stopKey() {
-        removeEventListener("keydown", this.keydown);
-        removeEventListener("keyup", this.keyup);
-    }
+export function removeKeys() {
+    removeEventListener("keydown", keydown);
+    removeEventListener("keyup", keyup);
+}
 
-    static stopMouse() {
-        removeEventListener("mousemove", this.mousemove);
-        removeEventListener("mousedown", this.mousedown);
-        removeEventListener("mouseup", this.mouseup);
-    }
+export function removeMouse() {
+    removeEventListener("mousemove", mousemove);
+    removeEventListener("mousedown", mousedown);
+    removeEventListener("mouseup", mouseup);
+}
 
-    static stopAll() {
-        this.stopKey();
-        this.stopMouse();
-    }
+export function removeAll() {
+    removeKeys();
+    removeMouse();
+}
 
-    private static keydown(e: KeyboardEvent) {
-        if (!Input.key(e.key)) Input.keys.push(e.key);
-    }
+function keydown(e: KeyboardEvent) {
+    if (!isKey(e.key)) keys.push(e.key);
+}
 
-    private static keyup(e: KeyboardEvent) {
-        for (let i = 0; i < Input.keys.length; i++) if (Input.keys[i] === e.key) return Input.keys.splice(i);
-    }
+function keyup(e: KeyboardEvent) {
+    for (let i = 0; i < keys.length; i++) if (keys[i] === e.key) return keys.splice(i);
+}
 
-    private static mousemove(e: MouseEvent) {
-        Input._mouseX = e.clientX;
-        Input._mouseY = e.clientY;
-    }
+function mousemove(e: MouseEvent) {
+    _mouseX = e.clientX;
+    _mouseY = e.clientY;
+}
 
-    private static mousedown() {
-        Input._isMouseDown = true;
-    }
+function mousedown() {
+    _isMouseDown = true;
+}
 
-    private static mouseup() {
-        Input._isMouseDown = false;
-    }
+function mouseup() {
+    _isMouseDown = false;
+}
 
-    static get mouseX() { return this._mouseX; }
-    static get mouseY() { return this._mouseY; }
-    static get isMouseDown() { return this._isMouseDown; }
+export function mouseX() { return _mouseX; }
+export function mouseY() { return _mouseY; }
+export function isMouseDown() { return _isMouseDown; }
 
-    static key(k: string) {
-        for (let i = 0; i < this.keys.length; i++) if (this.keys[i] === k) return true;
-        return false;
-    }
+export function isKey(k: string) {
+    for (let i = 0; i < keys.length; i++) if (keys[i] === k) return true;
+    return false;
 }
