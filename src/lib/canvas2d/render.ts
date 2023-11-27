@@ -1,6 +1,6 @@
-import { Entity, Processor, World } from "../ecs/base";
+import { Entity, Processor, World } from "../engine/base";
 import { getAllParents } from "../hierarchy";
-import { Vector2D } from "../util_2d/linear_algebra/vector";
+import { Vector2D } from "../util_2d/linear_algebra";
 import { Transform2D } from "../util_2d/transform";
 import { C2DFill } from "./fill";
 

@@ -1,12 +1,11 @@
 import { C2DColor } from "../lib/canvas2d/fill";
 import { C2DRender, createC2DRenderProcessor } from "../lib/canvas2d/render";
-import { Entity, Scene, System, World } from "../lib/ecs/base";
-import { dt } from "../lib/ecs/loop";
+import { Entity, Scene, System, World } from "../lib/engine/base";
 import { enforceHierarchy } from "../lib/hierarchy";
-import { Matrix2D } from "../lib/util_2d/linear_algebra/matrix";
-import { Vector2D } from "../lib/util_2d/linear_algebra/vector";
+import { Vector2D, Matrix2D } from "../lib/util_2d/linear_algebra";
 import { Transform2D } from "../lib/util_2d/transform";
-import { isKey } from "../lib/ecs/input";
+import { MonoScriptable, behaviorSystem } from "../lib/behavior";
+import TestBehavior from "../behaviors/Test.behavior";
 
 function testWorld() {
     const world = new World();
@@ -17,9 +16,12 @@ function testWorld() {
         ),
         new Transform2D(
             new Vector2D(200, 200),
-            new Matrix2D(new Vector2D(2, -1), new Vector2D(1, 1)),
+            new Matrix2D(2, 1, -1, 1),
             0,
-        )
+        ),
+        new MonoScriptable(
+            new TestBehavior(10),
+        ),
     );
 
     const gun = new Entity(
@@ -38,7 +40,10 @@ function testWorld() {
         ),
         new Transform2D(
             new Vector2D(0, 0),
-            new Matrix2D(new Vector2D(1 / 3, 1 / 3), new Vector2D(-1 / 3, 2 / 3)),
+            new Matrix2D(
+                1 / 3, -1 / 3,
+                1 / 3, 2 / 3
+            ),
             0,
         )
     );
@@ -50,11 +55,9 @@ function testWorld() {
     return world;
 }
 
-const testSystem = (): System => {
+function testSystem(): System {
     let frame = 0;
     return w => {
-        w.get(0)!.get(Transform2D)!.rotation += dt * (isKey("a") ? 5 : -5);
-
         if (frame % 100 === 0) w.add(
             new Entity(
                 new Transform2D(
@@ -68,8 +71,8 @@ const testSystem = (): System => {
                     -100, -75,
                     200, 150,
                     C2DColor.random(), 0,
-                ])
-            )
+                ]),
+            ),
         );
 
         return (frame++ < 1000)
@@ -80,6 +83,6 @@ const testSystem = (): System => {
 
 export default [
     testWorld,
-    [testSystem()],
+    [testSystem(), behaviorSystem],
     [createC2DRenderProcessor(true)]
 ] as Scene;

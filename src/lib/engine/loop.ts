@@ -21,7 +21,8 @@ export function initProgram(scenes: Scene[], startId = 0) {
             intervalId = setInterval(() => {
                 const now = performance.now();
                 dt = (now - before) / 1000, before = now;
-                for (let i = 0, result = systems[i](world); i < systemSize; i++)
+                for (let i = 0; i < systemSize; i++) {
+                    const result = systems[i](world);
                     switch (result[0]) {
                         case "continue":
                             break;
@@ -36,6 +37,7 @@ export function initProgram(scenes: Scene[], startId = 0) {
                             processors = scenes[result[1]][2];
                             break;
                     }
+                }
             }, 2),
             processorSize = processors.length,
             stop = setAnimation(() => {

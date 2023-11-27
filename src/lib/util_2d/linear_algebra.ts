@@ -77,3 +77,39 @@ export class Vector2D extends Float32Array {
         return this.magnitudeSquared < 0.0001;
     }
 }
+
+export class Matrix2D extends Float32Array {
+    constructor(
+        a: number,
+        b: number,
+        c: number,
+        d: number
+    ) {
+        super(4);
+        this[0] = a;
+        this[1] = b;
+        this[2] = c;
+        this[3] = d;
+    }
+
+    get a() { return this[0]; }
+    get b() { return this[1]; }
+    get c() { return this[2]; }
+    get d() { return this[3]; }
+
+    set a(a: number) { this[0] = a; }
+    set b(b: number) { this[1] = b; }
+    set c(c: number) { this[2] = c; }
+    set d(d: number) { this[3] = d; }
+
+    transform(v: Vector2D) {
+        return new Vector2D(
+            v.x * this.a + v.y * this.b,
+            v.x * this.c + v.y * this.d,
+        );
+    }
+
+    clone() {
+        return new Matrix2D(this.a, this.b, this.c, this.d);
+    }
+}

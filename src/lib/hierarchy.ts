@@ -1,4 +1,4 @@
-import { Entity, World } from "./ecs/base";
+import { Entity, World } from "./engine/base";
 
 export class TreeNode {
     entity?: Entity;

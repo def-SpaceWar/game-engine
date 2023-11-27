@@ -1,4 +1,4 @@
-import { Command, Entity, Processor, System, World } from "./ecs/base";
+import { Command, Entity, Processor, System, World } from "./engine/base";
 
 export class MonoScriptable {
     entity?: Entity;
@@ -35,18 +35,50 @@ export class MonoScriptable {
     }
 }
 
-export abstract class Behavior {
+export type Behavior = {
     monoScriptable?: MonoScriptable;
+    update?: (world: World) => Command;
+    process?: (world: World) => void;
+};
 
-    update(world: World): Command {
-        return ["continue"];
-        world;
-    }
+export type InitBehavior = {
+    monoScriptable?: MonoScriptable;
+    init(world: World): void;
+    update(world: World): Command;
+    process?: (world: World) => void;
+};
 
-    process(world: World) {
-        return;
-        world;
-    }
+export type SetupBehavior = {
+    monoScriptable?: MonoScriptable;
+    update?: (world: World) => Command;
+    setup(world: World): void;
+    process(world: World): void;
+};
+
+export function init<T extends new (...args: any[]) => InitBehavior>(constructor: T) {
+    return class extends constructor {
+        private hasInit = false;
+        update(world: World) {
+            if (!this.hasInit) {
+                this.init(world);
+                this.hasInit = true;
+            }
+            return super.update(world);
+        }
+    };
+}
+
+export function setup<T extends new (...args: any[]) => SetupBehavior>(constructor: T) {
+    return class extends constructor {
+        private hasSetup = false;
+        process(world: World) {
+            if (!this.hasSetup) {
+                this.setup(world);
+                this.hasSetup = true;
+            }
+            return super.process(world);
+        }
+    };
 }
 
 export const behaviorSystem: System = world => {
@@ -54,6 +86,7 @@ export const behaviorSystem: System = world => {
         const monoScriptable = entity.get(MonoScriptable);
         if (!monoScriptable) continue;
         for (const behavior of monoScriptable.listAll()) {
+            if (!behavior.update) continue;
             const result = behavior.update(world);
             if (result[0] != "continue") return result;
         }
@@ -65,6 +98,7 @@ export const behaviorProcessor: Processor = world => {
     for (const entity of world.iterate()) {
         const monoScriptable = entity.get(MonoScriptable);
         if (!monoScriptable) continue;
-        for (const behavior of monoScriptable.listAll()) behavior.process(world);
+        for (const behavior of monoScriptable.listAll()) if (behavior.process)
+            behavior.process(world);
     }
 }
