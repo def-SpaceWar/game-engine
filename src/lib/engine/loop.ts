@@ -1,8 +1,12 @@
 import { Scene } from "./base";
 
+export let processDt = 0;
 function setAnimation(f: () => void) {
-    let id = requestAnimationFrame(fNew);
+    let id = requestAnimationFrame(fNew),
+        before = performance.now();
     function fNew() {
+        const now = performance.now();
+        processDt = (now - before) / 1000, before = now;
         f();
         id = requestAnimationFrame(fNew);
     };

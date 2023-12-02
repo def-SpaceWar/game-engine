@@ -70,13 +70,21 @@ function getRenderables(world: World) {
     return renderables;
 }
 
+export let canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D;
+
+export function canvasPos() {
+    const rect = canvas.getBoundingClientRect();
+    return new Vector2D(rect.left, rect.top);
+}
+
 export function createC2DRenderProcessor(
     hierarchy = false,
     fallback: Processor = _ => { }
 ): Processor {
-    const canvas = document.getElementById("app")!
+    canvas = document.getElementById("app")!
         .appendChild(document.createElement("canvas")),
-        ctx = canvas.getContext("2d");
+        ctx = canvas.getContext("2d")!;
 
     if (!ctx) {
         console.error("Browser does not support CanvasRenderingContext2D!");
@@ -176,5 +184,5 @@ export function createC2DRenderProcessor(
                 draw(render);
                 ctx.restore();
             }
-       })
+        })
 }

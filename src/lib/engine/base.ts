@@ -7,21 +7,21 @@ export class Entity {
         for (let i = 0; i < size; i++) this.add(components[i]);
     }
 
-    add(c: Component) {
-        this.map.set(c.constructor.name, c);
-        c.entity = this;
+    add(component: Component) {
+        this.map.set(component.constructor.name, component);
+        component.entity = this;
     }
 
-    remove(c: new (...args: any[]) => Component) {
-        const name = c.name,
+    remove(component: new (...args: any[]) => Component) {
+        const name = component.name,
             comp = this.map.get(name);
         if (!comp) return;
         this.map.delete(name);
         comp.entity = undefined;
     }
 
-    get<T extends Component>(c: new (...args: any[]) => T): T | undefined {
-        return this.map.get(c.name) as T | undefined;
+    get<T extends Component>(component: new (...args: any[]) => T): T | undefined {
+        return this.map.get(component.name) as T | undefined;
     }
 
     reset() {
@@ -43,19 +43,19 @@ export class World {
         for (let i = 0; i < size; i++) this.add(entities[i]);
     }
 
-    add(e: Entity) {
+    add(entity: Entity) {
         if (this.entityCount === this.maxEntityCount) {
-            e.id = this.maxEntityCount;
+            entity.id = this.maxEntityCount;
             this.maxEntityCount += 1;
             this.entityCount++;
-            this.entities[e.id] = e;
+            this.entities[entity.id] = entity;
             return;
         }
 
         for (let i = 0; i < this.maxEntityCount; i++) {
             if (this.entities[i] === undefined) {
-                e.id = i;
-                this.entities[i] = e;
+                entity.id = i;
+                this.entities[i] = entity;
                 this.entityCount++;
                 return;
             }

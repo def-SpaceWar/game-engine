@@ -9,21 +9,21 @@ export class MonoScriptable {
         for (let i = 0; i < size; i++) this.add(behaviors[i]);
     }
 
-    add(b: Behavior) {
-        this.map.set(b.constructor.name, b);
-        b.monoScriptable = this;
+    add(behavior: Behavior) {
+        this.map.set(behavior.constructor.name, behavior);
+        behavior.monoScriptable = this;
     }
 
-    remove(c: new (...args: any[]) => Behavior) {
-        const name = c.name,
-            comp = this.map.get(name);
-        if (!comp) return;
+    remove(behavior: new (...args: any[]) => Behavior) {
+        const name = behavior.name,
+            behav = this.map.get(name);
+        if (!behav) return;
         this.map.delete(name);
-        comp.monoScriptable = undefined;
+        behav.monoScriptable = undefined;
     }
 
-    get<T extends Behavior>(c: new (...args: any[]) => T): T | undefined {
-        return this.map.get(c.name) as T | undefined;
+    get<T extends Behavior>(behavior: new (...args: any[]) => T): T | undefined {
+        return this.map.get(behavior.name) as T | undefined;
     }
 
     reset() {

@@ -102,14 +102,16 @@ export class Matrix2D extends Float32Array {
     set c(c: number) { this[2] = c; }
     set d(d: number) { this[3] = d; }
 
+    get det() { return this.a * this.d - this.b * this.c; }
+
+    clone() {
+        return new Matrix2D(this.a, this.b, this.c, this.d);
+    }
+
     transform(v: Vector2D) {
         return new Vector2D(
             v.x * this.a + v.y * this.b,
             v.x * this.c + v.y * this.d,
         );
-    }
-
-    clone() {
-        return new Matrix2D(this.a, this.b, this.c, this.d);
     }
 }
